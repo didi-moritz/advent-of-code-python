@@ -1,23 +1,24 @@
 with open('day-01.data') as f:
     data = [line.rstrip('\n') for line in f]
 
-max = 0
 current = 0
+sums = []
 
 
-def check():
-    global max, current
-    if current > max:
-        max = current
+def store_sum():
+    global current
+    sums.append(current)
     current = 0
 
 
 for n in data:
     if n == '':
-        check()
+        store_sum()
     else:
         current = current + int(n)
 
-check()
+store_sum()
 
-print(max)
+sums.sort(reverse=True)
+
+print(sums[0] + sums[1] + sums[2])
