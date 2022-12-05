@@ -21,7 +21,7 @@ for i in range(stack_numbers_line + 2, len(data)):
     line = data[i]
     print(line)
     count, from_stack, to_stack = [int(i) for i in (re.search('move (\d+) from (\d) to (\d)', line).groups())]
-    for i in range(0, count):
+    for j in range(0, count):
         stacks[to_stack - 1].append(stacks[from_stack - 1].pop())
 
 result = ''
