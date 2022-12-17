@@ -1,7 +1,6 @@
 import math
 import os
 import sys
-import time
 
 sys.setrecursionlimit(10000)
 
@@ -54,8 +53,6 @@ for i in range(height):
             c = 'z'
 
         m[i].append(ord(c) - ord('a'))
-
-print(start)
 
 moves = [Point(0, -1), Point(0, 1), Point(-1, 0), Point(1, 0)]
 
@@ -140,16 +137,20 @@ def check_surroundings(already, new_point):
 
 jump(start, [])
 
-mapp = vv[start].copy()
-mapp.append(Point(88, 11))
+for y in range(height):
+    for x in range(width):
+        point = Point(x, y)
+        if point not in vv[start] and point != start:
+            if point in v:
+                del v[point]
+            if point in vv:
+                del vv[point]
 
-print_map(mapp)
+jump(start, [])
 
-print(len(v))
-print(width * height)
-
-print(v[Point(88, 11)])
-print(v[Point(90, 13)])
+all_steps = vv[start].copy()
+all_steps.append(start)
+print_map(all_steps)
 
 print('finished')
 print(v[start])
