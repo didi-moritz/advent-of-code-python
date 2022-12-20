@@ -1,4 +1,7 @@
 import sys
+import time
+
+start = time.time()
 
 with open('day-18.data') as f:
     data = [line.rstrip('\n') for line in f]
@@ -24,6 +27,9 @@ class Cube:
     def add(self, other):
         return Cube(self.x + other.x, self.y + other.y, self.z + other.z)
 
+    def near(self, other):
+        return abs(self.x - other.x) + abs(self.y - other.y) + abs(self.z - other.z) < 3
+
 
 cubes: list[Cube] = []
 
@@ -47,13 +53,32 @@ max_y = 0
 max_z = 0
 
 
+def check_distance(outside: Cube):
+    for cube in cubes:
+        if outside.near(cube):
+            return True
+    return False
+
+
 def find_outside_cube(cube: Cube):
     if min_x <= cube.x <= max_x and min_y <= cube.y <= max_y and min_z <= cube.z <= max_z \
             and cube not in outside \
-            and cube not in cubes:
+            and cube not in cubes \
+            and check_distance(cube):
+
         outside.append(cube)
         for move in moves:
             find_outside_cube(cube.add(move))
+
+
+def find_first_outside_cube():
+    previous = Cube(min_x, min_y, min_z)
+    for y in range(min_y + 1, max_y):
+        for z in range(min_z + 1, max_z):
+            cube = Cube(min_x + 1, y, z)
+            if cube in cubes:
+                return previous
+            previous = cube
 
 
 def find_outside():
@@ -66,8 +91,8 @@ def find_outside():
         max_y = max(max_y, cube.y + 1)
         max_z = max(max_z, cube.z + 1)
 
-    find_outside_cube(Cube(min_x, min_y, min_z))
-    print('found outside')
+    find_outside_cube(find_first_outside_cube())
+    print(f'found outside, duration meanwhile {int(time.time() - start)}s')
 
 
 find_outside()
@@ -84,3 +109,5 @@ def action():
 
 
 action()
+
+print(f'duration {int(time.time() - start)}s')
