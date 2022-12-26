@@ -13,9 +13,6 @@ for i in data:
 
     steps = i % len(n)
 
-    while steps < 0:
-        steps += len(n)
-
     n = n[0:steps] + [i] + n[steps:len(n)]
 
 index_0 = n.index(0)
