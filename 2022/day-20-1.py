@@ -16,8 +16,6 @@ for i in data:
     while steps < 0:
         steps += len(n)
 
-    move_dir = 1 if i > 0 else 0
-
     n = n[0:steps] + [i] + n[steps:len(n)]
 
 index_0 = n.index(0)
