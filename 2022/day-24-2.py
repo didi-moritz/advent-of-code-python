@@ -64,8 +64,8 @@ ALL_DIRS_1_3 = [S, E, N, W, WAIT]
 
 ALL_DIRS_2 = [W, N, E, S, WAIT]
 
-blizzards_h = {}
-blizzards_v = {}
+blizzards_h = []
+blizzards_v = []
 blizzards_all = []
 already_visited = {}
 
@@ -76,11 +76,6 @@ def possible_go_tos(pos, way):
 
 def load():
     for y in range(height):
-        blizzards_h[y] = []
-    for x in range(width):
-        blizzards_v[x] = []
-
-    for y in range(height):
         for x in range(width):
             if data[y + 1][x + 1] == '.':
                 continue
@@ -88,24 +83,55 @@ def load():
             point = Point(x, y)
 
             if data[y + 1][x + 1] == '>':
-                blizzards_h[y].append(Blizzard(point, E))
+                blizzards_h.append(Blizzard(point, E))
             elif data[y + 1][x + 1] == '<':
-                blizzards_h[y].append(Blizzard(point, W))
+                blizzards_h.append(Blizzard(point, W))
             elif data[y + 1][x + 1] == '^':
-                blizzards_v[x].append(Blizzard(point, N))
+                blizzards_v.append(Blizzard(point, N))
             else:
-                blizzards_v[x].append(Blizzard(point, S))
+                blizzards_v.append(Blizzard(point, S))
 
-    for blizzards in blizzards_v.values():
-        for blizzard in blizzards:
-            blizzards_all.append(blizzard)
+    for blizzard in blizzards_v:
+        blizzards_all.append(blizzard)
 
-    for blizzards in blizzards_h.values():
-        for blizzard in blizzards:
-            blizzards_all.append(blizzard)
+    for blizzard in blizzards_h:
+        blizzards_all.append(blizzard)
 
 
 load()
+
+blizzards_h_map = []
+blizzards_v_map = []
+
+
+def create_empty_map():
+    m = []
+    for y in range(height):
+        m.append([False] * width)
+    return m
+
+
+def fill_maps():
+    for minute in range(height):
+        m = create_empty_map()
+
+        for blizzard in blizzards_v:
+            point = blizzard.get_pos(minute)
+            m[point.y][point.x] = True
+
+        blizzards_v_map.append(m)
+
+    for minute in range(width):
+        m = create_empty_map()
+
+        for blizzard in blizzards_h:
+            point = blizzard.get_pos(minute)
+            m[point.y][point.x] = True
+
+        blizzards_h_map.append(m)
+
+
+fill_maps()
 
 
 def print_map(pos, minute, way):
@@ -176,40 +202,20 @@ def action(pos: Point, finish: Point, minute: int, way: int):
 
     go_tos = possible_go_tos(pos, way)
 
-    min_x = width
-    max_x = 0
-    min_y = height
-    max_y = 0
-
     for go_to in go_tos:
         if go_to == finish:
             min_steps = min(min_steps, minute)
             return
 
-        if (0 > go_to.x or go_to.x >= width) or (0 > go_to.y or go_to.y >= height) and go_to != START and go_to != END:
-            go_tos[go_to] = False
-
-    for go_to in go_tos:
-        if not go_tos[go_to]:
+        if go_to == START or go_to == END:
             continue
-        min_x = min(min_x, go_to.x)
-        max_x = max(max_x, go_to.x)
-        min_y = min(min_y, go_to.y)
-        max_y = max(max_y, go_to.y)
 
-    for y in range(min_y, max_y + 1):
-        if 0 <= y < height:
-            for blizzard in blizzards_h[y]:
-                point = blizzard.get_pos(minute)
-                if point in go_tos:
-                    del go_tos[point]
-
-    for x in range(min_x, max_x + 1):
-        if 0 <= x < width:
-            for blizzard in blizzards_v[x]:
-                point = blizzard.get_pos(minute)
-                if point in go_tos:
-                    del go_tos[point]
+        if (0 > go_to.x or go_to.x >= width) or (0 > go_to.y or go_to.y >= height):
+            go_tos[go_to] = False
+        elif blizzards_v_map[minute % height][go_to.y][go_to.x]:
+            go_tos[go_to] = False
+        elif blizzards_h_map[minute % width][go_to.y][go_to.x]:
+            go_tos[go_to] = False
 
     for go_to in go_tos:
         if go_tos[go_to]:
