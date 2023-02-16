@@ -11,7 +11,7 @@ result = 0
 
 
 def is_abba(text):
-    matches = list(filter(lambda i: i[0] != i[1], abba_pattern.findall(part)))
+    matches = list(filter(lambda i: i[0] != i[1], abba_pattern.findall(text)))
     return len(matches) > 0
 
 
