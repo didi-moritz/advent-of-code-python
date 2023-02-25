@@ -10,50 +10,47 @@ def count_alphas(line):
     return len(alpha_pattern.findall(line))
 
 
-def calc_range(range_start, range_end, line):
+def is_alpha(character):
+    return alpha_pattern.match(character)
+
+
+def sum_up(start, end, chars):
     sum = 0
-    pos = range_start
-    min_start_pos = -1
-    max_end_pos = range_start
-    while True:
-        s = line.find('(', pos)
-        if range_start <= s <= range_end:
-            if min_start_pos == -1:
-                min_start_pos = s
+    for i in range(start, end):
+        if type(chars[i]) == int:
+            sum += chars[i]
+        elif is_alpha(chars[i]):
+            sum += 1
 
-            e = line.find(')', s)
-            if e > 0:
-                command = line[s + 1:e]
-                length, times = list(map(int, command.split('x')))
-                range_sum = calc_range(e + 1, e + length + 1, line)
-                sum += range_sum * times
-
-                max_end_pos = max(max_end_pos, e + length + 1)
-
-                pos = e + length + 1
-            else:
-                break
-        else:
-            break
-
-    if min_start_pos > -1 and min_start_pos != range_start:
-        sum += min_start_pos - range_start
-
-    sum += range_end - max_end_pos
-
+        chars[i] = ''
     return sum
 
 
-result = 0
-for line in data:
-    print(line)
+def calc_line(line):
+    chars = list(map(lambda i: i, line))
+    for pos in range(len(chars) - 1, -1, -1):
+        if chars[pos] == '(':
+            end = pos + 1
+            while chars[end] != ')':
+                end += 1
 
-    number = calc_range(0, len(line), line)
-    print(number)
+            end = line.find(')', pos)
+            command = line[pos + 1:end]
+            length, times = list(map(int, command.split('x')))
 
-    result += number
+            sum = sum_up(pos, end + 1 + length, chars)
+            chars[pos] = sum * times
 
-print(result)
+    return sum_up(0, len(chars), chars)
+
+
+def action():
+    for line in data:
+        print(line)
+        print(calc_line(line))
+
+
+action()
 
 # X(9x2)(3x3)ABCY
 #
@@ -75,6 +72,10 @@ print(result)
 # XABCBCBCZEABCBCBCZEX
 # -> 20
 #
-# X(10x2)A(2x3)BCZEX
 #
 # 1 + 2 * (1 + 2 + (2 * 3)) + 1
+
+
+# X(10x2)A(2x3)BCZEX
+# X(10x2)A[6]    ZEX
+# X[18]            X
