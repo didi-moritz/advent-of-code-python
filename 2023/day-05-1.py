@@ -1,4 +1,3 @@
-import math
 import re
 
 with open('day-05.data') as f:
