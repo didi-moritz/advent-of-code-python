@@ -1,5 +1,3 @@
-import math
-
 with open('day-11.data') as f:
     data = [line.rstrip('\n') for line in f]
 
