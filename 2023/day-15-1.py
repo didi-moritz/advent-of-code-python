@@ -24,5 +24,3 @@ def action():
 
 
 print(action())
-
-# 88032 too low
